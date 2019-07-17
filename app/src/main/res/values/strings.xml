@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">News Reader</string>
-    <string name="title_textview">Latest News</string>
+    <string name="title_textview">Top News</string>
 </resources>
