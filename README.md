@@ -2,7 +2,7 @@
 News Reader App based on "The Complete Android Oreo Developer Course" from Rob Percival.
 
 # Description
-The App displays a list of top news from the website https://news.ycombinator.com/ in the main activity. The user can select the desired article to read, which launches the ArticleActivity and displays the content in a webView widget.
+The App displays a list of top news from which the user can then choose to read in the app.
 
 # Characteristics
 - Main Activity contains ListView to display the title of the available articles
