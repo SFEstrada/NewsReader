@@ -78,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
                 // Create the JSON Array to read the data
                 JSONArray jsonArray = new JSONArray(result);
                 // Maximum number of items to read
-                int maxItems = 2;
+                int maxItems = 5;
 
                 // If there are less than 20 items, then define new max number
-                if(jsonArray.length() < 2){
+                if(jsonArray.length() < 5){
                     maxItems = jsonArray.length();
                 }
 
