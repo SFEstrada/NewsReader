@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">News Reader</string>
-    <string name="title_textview">Top News</string>
+    <string name="title_topstories">Top Stories</string>
+    <string name="title_newstories">New Stories</string>
+    <string name="button_topstories">Top Stories</string>
+    <string name="button_newstories">New Stories</string>
 </resources>

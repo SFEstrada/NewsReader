@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#212E6B</color>
     <color name="colorAccent">#e16e79</color>
     <color name="activityBackground">#364EB9</color>
-    <color name="listLayoutBackground">#efefef</color>
+    <color name="listLayoutBackground">#EFEFEF</color>
     <color name="listBackground">#FFFFFF</color>
+    <color name="buttonSelected">#FFFFFF</color>
+    <color name="buttonColor">#AFAEAE</color>
 </resources>

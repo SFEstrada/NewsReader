@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -26,10 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     // View elements
     ListView newsListView;
+    Button topButton, newButton;
 
     // Array variables
     ArrayList<String> titleList = new ArrayList<String>();
-    ArrayList<String> contentList = new ArrayList<String>();
+    ArrayList<String> urlList = new ArrayList<String>();
     ArrayAdapter arrayAdapter;
 
     // SQLite database to store content
@@ -78,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 // Create the JSON Array to read the data
                 JSONArray jsonArray = new JSONArray(result);
                 // Maximum number of items to read
-                int maxItems = 5;
+                int maxItems = 15;
 
                 // If there are less than 20 items, then define new max number
-                if(jsonArray.length() < 5){
+                if(jsonArray.length() < 15){
                     maxItems = jsonArray.length();
                 }
 
@@ -121,35 +123,16 @@ public class MainActivity extends AppCompatActivity {
                         String articleTitle = jsonObject.getString("title");
                         String articleUrl = jsonObject.getString("url");
 
-                        // Download the information from the urls
-                        url = new URL(articleUrl);
-                        // Establish the connection
-                        httpURLConnection = (HttpURLConnection) url.openConnection();
-                        // Initiate input stream and stream reader
-                        inputStream = httpURLConnection.getInputStream();
-                        inputStreamReader = new InputStreamReader(inputStream);
-
-                        // Read the data
-                        data = inputStreamReader.read();
-                        // Make string with articles content
-                        String articleContent = "";
-                        // Download the data
-                        while (data != -1){
-                            char current = (char) data;
-                            articleContent += current;
-                            data = inputStreamReader.read();
-                        }
-
-                        Log.i("html content", articleContent);
+                        Log.i("Websites", articleUrl);
 
                         // String to insert the information into the DB
-                        String sqlData = "INSERT INTO articles (articleId, title, content) VALUES (?, ?, ?)";
+                        String sqlData = "INSERT INTO articles (articleId, title, arturl) VALUES (?, ?, ?)";
                         // SQL statement to send the downloaded information
                         SQLiteStatement sqLiteStatement = articlesDB.compileStatement(sqlData);
                         // Pass information to the DB
                         sqLiteStatement.bindString(1, articleID);
                         sqLiteStatement.bindString(2, articleTitle);
-                        sqLiteStatement.bindString(3, articleContent);
+                        sqLiteStatement.bindString(3, articleUrl);
 
                         // Execute the statement
                         sqLiteStatement.execute();
@@ -191,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = articlesDB.rawQuery("SELECT * FROM articles", null);
 
         int titleIndex = cursor.getColumnIndex("title");
-        int contentIndex = cursor.getColumnIndex("content");
+        int urlIndex = cursor.getColumnIndex("arturl");
 
         cursor.moveToFirst();
         try{
@@ -199,11 +182,11 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.moveToFirst()){
                 // Clear arrayList content
                 titleList.clear();
-                contentList.clear();
+                urlList.clear();
 
                 do{
                     titleList.add(cursor.getString(titleIndex));
-                    contentList.add(cursor.getString(contentIndex));
+                    urlList.add(cursor.getString(urlIndex));
                 }while (cursor.moveToNext());
 
                 // Notify ArrayAdapter of the changes
@@ -219,6 +202,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void clickTopButton(View view){
+        // Create downloadTask
+        DownloadTask downloadTask = new DownloadTask();
+        try{
+            downloadTask.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        // Change text color
+        topButton.setTextColor(getColor(R.color.buttonSelected));
+        newButton.setTextColor(getColor(R.color.buttonColor));
+    }
+
+    public void clickNewButton(View view){
+        // Create downloadTask
+        DownloadTask downloadTask = new DownloadTask();
+        try{
+            downloadTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        // Change text color
+        topButton.setTextColor(getColor(R.color.buttonColor));
+        newButton.setTextColor(getColor(R.color.buttonSelected));
+    }
+
     /**
      * Main method that initialises elements on the Main Activity
      * @param savedInstanceState
@@ -230,14 +243,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Create view elements
         newsListView = findViewById(R.id.newsListView);
+        topButton = findViewById(R.id.topButton);
+        newButton = findViewById(R.id.newButton);
         // Create array adapter and apply to listView
         arrayAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_expandable_list_item_1, titleList);
         newsListView.setAdapter(arrayAdapter);
 
         // Create or open DB
         articlesDB = this.openOrCreateDatabase("Articles", MODE_PRIVATE, null);
-        // Create the table articles with" id, articleId, title, and content
-        articlesDB.execSQL("CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY, articleId INTEGER, title VARCHAR, content VARCHAR)");
+        // Create the table articles with" id, articleId, title, and urls
+        articlesDB.execSQL("CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY, articleId INTEGER, title VARCHAR, arturl VARCHAR)");
 
         // Create downloadTask
         DownloadTask downloadTask = new DownloadTask();
@@ -255,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                 // Create a new intent to open Article webView activity
                 Intent intent = new Intent(getApplicationContext(), ArticleActivity.class);
                 // Provide content to open in the webView
-                intent.putExtra("content", contentList.get(position));
+                intent.putExtra("arturl", urlList.get(position));
                 // Start new activity
                 startActivity(intent);
             }
