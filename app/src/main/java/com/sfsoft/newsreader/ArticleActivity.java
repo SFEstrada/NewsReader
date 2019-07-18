@@ -18,15 +18,14 @@ public class ArticleActivity extends AppCompatActivity {
 
         // Create webView
         webView = findViewById(R.id.webView);
-        // Enable Java script
-        webView.getSettings().setJavaScriptEnabled(true);
+
         // Initialise web client
         webView.setWebViewClient(new WebViewClient());
 
         // Initialise intent
         Intent intent = getIntent();
         // Read extra information and pass it to the webView
-        webView.loadData(intent.getStringExtra("content"), "text/html", "UTF-8");
+        webView.loadUrl(intent.getStringExtra("arturl"));
 
     }
 }
